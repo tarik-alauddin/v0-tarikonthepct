@@ -5,7 +5,7 @@ import { useTheme } from "next-themes"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
-import { Mountain, Footprints, TrendingUp, Clock, Sun, Moon } from "lucide-react"
+import { Mountain, Footprints, TrendingUp, TrendingDown, Clock, Sun, Moon, Calendar } from "lucide-react"
 import ActivityCard from "@/components/activity-card"
 import PCTMap from "@/components/pct-map"
 
@@ -56,13 +56,18 @@ export default function PCTDashboard() {
     const hikingDays = activities.filter(a => a.miles > 0)
     const totalMiles = activities.reduce((sum, a) => sum + a.miles, 0)
     const totalElevationGain = activities.reduce((sum, a) => sum + a.elevation_gain, 0)
+    const totalElevationLoss = activities.reduce((sum, a) => sum + a.elevation_loss, 0)
     const totalDuration = activities.reduce((sum, a) => sum + a.duration, 0)
     const avgMilesPerHikingDay = hikingDays.length > 0 ? totalMiles / hikingDays.length : 0
+    // Estimate steps: ~2,200 steps per mile on average for hiking
+    const totalSteps = Math.round(totalMiles * 2200)
 
     return {
       totalMiles,
       totalElevationGain,
+      totalElevationLoss,
       totalDuration,
+      totalSteps,
       avgMilesPerHikingDay,
       totalDays: activities.length,
       hikingDays: hikingDays.length,
@@ -138,9 +143,10 @@ export default function PCTDashboard() {
           {/* PCT Map - Left Side */}
           <PCTMap totalMiles={stats.totalMiles} />
 
-          {/* Stats Cards - Right Side (1 per row) */}
-          <div className="flex flex-col gap-4">
-            <Card className="bg-card border-border flex-1">
+          {/* Stats Cards - Right Side (2 per row) */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Total Miles */}
+            <Card className="bg-card border-border">
               <CardContent className="p-6 h-full flex items-center justify-center">
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="p-2 bg-primary/10 rounded-lg">
@@ -152,31 +158,73 @@ export default function PCTDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="bg-card border-border flex-1">
+            {/* Total Steps */}
+            <Card className="bg-card border-border">
+              <CardContent className="p-6 h-full flex items-center justify-center">
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <div className="p-2 bg-purple-500/10 rounded-lg">
+                    <Footprints className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <p className="text-xs text-muted-foreground">Total Steps</p>
+                  <p className="text-2xl font-bold text-foreground">{(stats.totalSteps / 1000000).toFixed(2)}M</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Elevation Gain */}
+            <Card className="bg-card border-border">
               <CardContent className="p-6 h-full flex items-center justify-center">
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="p-2 bg-green-500/10 rounded-lg">
                     <TrendingUp className="h-5 w-5 text-green-500" />
                   </div>
-                  <p className="text-xs text-muted-foreground">Total Elevation</p>
-                  <p className="text-2xl font-bold text-foreground">{(stats.totalElevationGain / 1000).toFixed(1)}k ft</p>
+                  <p className="text-xs text-muted-foreground">Elevation Gain</p>
+                  <p className="text-2xl font-bold text-foreground">+{(stats.totalElevationGain / 1000).toFixed(1)}k ft</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-card border-border flex-1">
+            {/* Elevation Loss */}
+            <Card className="bg-card border-border">
+              <CardContent className="p-6 h-full flex items-center justify-center">
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <div className="p-2 bg-red-500/10 rounded-lg">
+                    <TrendingDown className="h-5 w-5 text-red-500" />
+                  </div>
+                  <p className="text-xs text-muted-foreground">Elevation Loss</p>
+                  <p className="text-2xl font-bold text-foreground">-{(stats.totalElevationLoss / 1000).toFixed(1)}k ft</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Time Hiking */}
+            <Card className="bg-card border-border">
               <CardContent className="p-6 h-full flex items-center justify-center">
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="p-2 bg-blue-500/10 rounded-lg">
                     <Clock className="h-5 w-5 text-blue-500" />
                   </div>
-                  <p className="text-xs text-muted-foreground">Time on Trail</p>
+                  <p className="text-xs text-muted-foreground">Time Hiking</p>
                   <p className="text-2xl font-bold text-foreground">{formatTotalDuration(stats.totalDuration)}</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-card border-border flex-1">
+            {/* Days on Trail */}
+            <Card className="bg-card border-border">
+              <CardContent className="p-6 h-full flex items-center justify-center">
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <div className="p-2 bg-orange-500/10 rounded-lg">
+                    <Calendar className="h-5 w-5 text-orange-500" />
+                  </div>
+                  <p className="text-xs text-muted-foreground">Days on Trail</p>
+                  <p className="text-2xl font-bold text-foreground">{stats.totalDays}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Avg Miles/Day - spans full width */}
+            <Card className="bg-card border-border col-span-2">
               <CardContent className="p-6 h-full flex items-center justify-center">
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="p-2 bg-yellow-500/10 rounded-lg">
@@ -203,7 +251,7 @@ export default function PCTDashboard() {
             </div>
           </CardHeader>
           <CardContent className="p-0">
-            <ScrollArea className="h-[500px] px-6 pb-6">
+            <ScrollArea className="h-[680px] px-6 pb-6">
               <div className="space-y-3">
                 {activities.map((activity, index) => (
                   <ActivityCard

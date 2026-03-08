@@ -38,13 +38,13 @@ export default function ActivityCard({ activity, dayNumber }: ActivityCardProps)
 
   return (
     <Card className="bg-card border-border hover:border-primary/50 transition-colors">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-3">
+      <CardContent className="p-4 h-full flex flex-col justify-center">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 border border-primary/20">
               <span className="text-sm font-bold text-primary">D{dayNumber}</span>
             </div>
-            <div>
+            <div className="flex flex-col justify-center">
               <p className="text-sm font-medium text-foreground">{formatDate(activity.activity_date)}</p>
               <p className="text-xs text-muted-foreground">{activity.activity_date}</p>
             </div>
