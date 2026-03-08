@@ -251,7 +251,7 @@ export default function PCTDashboard() {
             </div>
           </CardHeader>
           <CardContent className="p-0">
-            <ScrollArea className="h-[500px] px-6 pb-6">
+            <ScrollArea className="h-[680px] px-6 pb-6">
               <div className="space-y-3">
                 {activities.map((activity, index) => (
                   <ActivityCard
