@@ -1,10 +1,11 @@
 "use client"
 
+import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Mountain, TrendingUp, TrendingDown, Clock, Footprints } from "lucide-react"
 
-interface Activity {
+export interface Activity {
   activity_date: string
   miles: number
   elevation_gain: number
@@ -37,7 +38,8 @@ export default function ActivityCard({ activity, dayNumber }: ActivityCardProps)
   const isZeroDay = activity.miles === 0
 
   return (
-    <Card className="bg-card border-border hover:border-primary/50 transition-colors">
+    <Link href={`/activity/${activity.activity_date}`}>
+      <Card className="bg-card border-border hover:border-primary/50 transition-colors cursor-pointer">
       <CardContent className="p-4 h-full flex flex-col justify-center">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
@@ -94,5 +96,6 @@ export default function ActivityCard({ activity, dayNumber }: ActivityCardProps)
         )}
       </CardContent>
     </Card>
+    </Link>
   )
 }
